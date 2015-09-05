@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Cube Root Denesting Table</title>
+  <meta charset="UTF-8">
+  <style type="text/css">
+  h2 {margin: 0; padding-bottom: 10px;}
+  
+  table {border-collapse: collapse; margin-bottom: 10px;}
+  td, th {border: 1px solid #000; padding: 5px; vertical-align: middle; text-align: left; white-space: nowrap;}
+  
+  p {margin: 0; padding-bottom: 15px;}
+  
+  .o {text-decoration: overline;}
+  .b {font-weight: bold;}
+  </style>
+  <script>
+  function writeResults(sa, ea, sb, eb){
+    sa = Number(sa); ea = Number(ea);
+    sb = Number(sb); eb = Number(eb);
+    var toWrite = ""; // (a+√b)^3 = f*(x+y√z)
+    var x, y, z, f;
+    var sqFreeArr;
+    
+    var radOpen = "&radic;<span class=\"o\">";
+    var radClose = "</span>";
+    var bOpen = "<span class=\"b\">";
+    var bClose = "</span>";
+    
+    toWrite += "<table>";
+    toWrite += "<tr>";
+    toWrite += "<td>a\\b</td>";
+    for (var b = sb; b <= eb; b++){
+      if (String(Math.sqrt(b)).indexOf(".") == -1)continue;
+      toWrite += "<td>"+b+"</td>";
+    }
+    toWrite += "</tr>";
+    for (var a = sa; a <= ea; a++){
+      toWrite += "<tr>";
+      toWrite += "<td>"+a+"</td>";
+      for (var b = sb; b <= eb; b++){
+        if (String(Math.sqrt(b)).indexOf(".") == -1)continue;
+        toWrite += "<td>";
+        x = a*a*a+3*a*b;
+        sqFreeArr = squareFree(b);
+        y = (3*a*a+b)*sqFreeArr[0];
+        z = sqFreeArr[1];
+        f = gcd(x, y);
+        if (f != 1){
+          x = x/f;
+          y = y/f;
+          if (y == 1)y = "";
+          toWrite += bOpen+f+"*"+bClose+"("+x+"+"+y+radOpen+z+radClose+")";
+        } else {
+          toWrite += x+"+"+y+radOpen+z+radClose;
+        }
+        toWrite += "</td>";
+      }
+      toWrite += "</tr>";
+    }
+    toWrite += "</table>";
+    document.getElementById("results").innerHTML = toWrite;
+  }
+  
+  function gcd(a, b){
+    if (b == 0)return a;
+    else return gcd(b, a%b);
+  }
+  
+  function squareFree(b){
+    var takeOut = 1;
+    var sqFree = b;
+    var curr;
+    for (var i = Math.floor(Math.sqrt(b)); i > 1; i--){
+      curr = Math.pow(i, 2);
+      if (sqFree%curr == 0){
+        takeOut *= i;
+        sqFree /= curr;
+      }
+    }
+    return [takeOut, sqFree];
+  }
+  </script>
+</head>
+
+<body>
+  <h2>(a+&radic;b)<sup>3</sup> = f*(x+y&radic;z)</h2>
+  <form onsubmit="writeResults(this.sa.value, this.ea.value, this.sb.value, this.eb.value); return false;">
+    <p>
+      a: <input type="text" name="sa" value="1" autocomplete="off" size="4"> - 
+      <input type="text" name="ea" value="20" autocomplete="off" size="4">
+      b: <input type="text" name="sb" value="2" autocomplete="off" size="4"> - 
+      <input type="text" name="eb" value="11" autocomplete="off" size="4">
+      <input type="submit" style="display: none;">
+    </p>
+  </form>
+  <div id="results">
+    <script>
+    writeResults(1, 20, 2, 11);
+    </script>
+  </div>
+</body>
+
+</html>
